@@ -17,7 +17,8 @@ except Exception as e:
 
 # Define the label encoder mappings
 label_encoders = {}
-categorical_columns = ['Gender', 'Age', 'Education Level', 'Institution Type', 'IT Student', 'Location', 'Load-shedding', 'Financial Condition', 'Internet Type', 'Network Type', 'Class Duration', 'Self Lms', 'Device']
+categorical_columns = ['Gender', 'Age', 'Education Level', 'Institution Type', 'IT Student', 'Location', 'Load-shedding', 
+                      'Financial Condition', 'Internet Type', 'Network Type', 'Class Duration', 'Self Lms', 'Device']
 for col in categorical_columns:
     label_encoders[col] = LabelEncoder()
     if col == 'Gender':
@@ -63,6 +64,10 @@ def index():
 def adapt():
     return render_template('adaptivity.html')
 
+@app.route('/resources')
+def resources():
+    return render_template('resources.html')
+
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -86,7 +91,7 @@ def predict():
             'Device': request.form['device']
         }
 
-        # Validate Class Duration format (e.g., "0-1", "1-3")
+        # Validate Class Duration format
         class_duration = form_data['Class Duration']
         if '-' not in class_duration or len(class_duration.split('-')) != 2:
             return render_template('result.html', adaptivity_level=f"Error: Invalid Class Duration format: {class_duration}. Expected format: '0-1', '1-3', etc.")
@@ -100,7 +105,7 @@ def predict():
             except Exception as e:
                 return render_template('result.html', adaptivity_level=f"Error encoding {col}: {str(e)}")
 
-        # Convert to a DataFrame with column names to avoid UserWarning
+        # Convert to a DataFrame with column names
         input_data = pd.DataFrame([encoded_data], columns=categorical_columns)
 
         # Scale the input data
